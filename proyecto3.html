@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Inscripción Preparatoria Nuevo Ingreso</title>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(120deg, #3a7bd5, #00d2ff);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    form {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 30px 40px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 1.2s ease;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #ffffff;
+      font-weight: 400;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 15px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background-color: #0069d9;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #004aaf;
+      transform: translateY(-2px);
+    }
+
+    .success {
+      text-align: center;
+      color: #00ffb3;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    .error {
+      text-align: center;
+      color: #ff6060;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<form id="registroForm">
+  <h2>Formulario de Inscripción<br>Preparatoria 2025</h2>
+
+  <input type="text" name="nombre" placeholder="Nombre completo del estudiante" required>
+  <input type="email" name="email" placeholder="Correo electrónico del estudiante o tutor" required>
+  <input type="text" name="telefono" placeholder="Teléfono de contacto" required>
+
+  <select name="especialidad" required>
+    <option value="">Selecciona especialidad</option>
+    <option value="Físico-Matemáticas">Físico-Matemáticas</option>
+    <option value="Químico-Biológicas">Químico-Biológicas</option>
+    <option value="Ciencias Sociales">Ciencias Sociales</option>
+    <option value="Humanidades">Humanidades</option>
+  </select>
+
+  <button type="submit">Enviar Inscripción</button>
+  <div id="mensaje" class=""></div>
+</form>
+
+<script>
+  emailjs.init("TU_USER_ID_DE_EMAILJS"); // Reemplaza con tu User ID
+
+  const form = document.getElementById("registroForm");
+  const mensajeDiv = document.getElementById("mensaje");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    // Guardar en Google Sheets
+    fetch("TU_URL_DEL_SCRIPT_DE_GOOGLE_SHEETS", {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    // Enviar correo de confirmación
+    emailjs.send("TU_SERVICE_ID", "TU_TEMPLATE_ID", {
+      to_name: data.nombre,
+      to_email: data.email,
+      message: `Hola ${data.nombre}, tu inscripción a la Preparatoria ha sido registrada exitosamente en la especialidad de ${data.especialidad}. Pronto recibirás más información.`
+    }).then(function () {
+      mensajeDiv.textContent = "✅ Inscripción enviada con éxito. Revisa tu correo.";
+      mensajeDiv.className = "success";
+      form.reset();
+    }, function (error) {
+      mensajeDiv.textContent = "❌ Hubo un error al enviar el correo.";
+      mensajeDiv.className = "error";
+      console.error(error);
+    });
+  });
+</script>
+
+</body>
+</html>
